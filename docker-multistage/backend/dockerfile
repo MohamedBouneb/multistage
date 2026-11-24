@@ -1,0 +1,17 @@
+FROM ghcr.io/astral-sh/uv:python3.12-alpine
+
+RUN apk add --no-cache curl build-base libffi-dev postgresql-dev
+
+WORKDIR /app
+
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen
+
+COPY . .
+
+ENV PATH="/app/.venv/bin:$PATH"
+
+EXPOSE 8000
+
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
+
